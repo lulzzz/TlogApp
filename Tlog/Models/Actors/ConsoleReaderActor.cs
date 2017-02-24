@@ -13,6 +13,7 @@ namespace Tlog.Models.Actors
     {
         public const string StartCommand = "start";
         public const string ExitCommand = "exit";
+        public const string ClearScreen = "cls";
 
         #region Actors
 
@@ -54,16 +55,26 @@ namespace Tlog.Models.Actors
             {
                 Context.System.Terminate();
                 return;
-            }else if(input == "1")
+            }else if(!String.IsNullOrEmpty(input) &&
+                String.Equals(input, ClearScreen, StringComparison.OrdinalIgnoreCase))
+            {
+                Console.Clear();
+                Self.Tell(StartCommand);
+                return;                
+            }
+            else if(input == "1")
             {
                 doConvertTlog();
             }
+
+            getInput();
+
         }
 
         private void doConvertTlog()
         {
             TlogFileModel tlogFileModel = new TlogFileModel();
-            //get param
+            
             Console.WriteLine("Ruta tlog:");
 
             tlogFileModel.BinFile = Console.ReadLine();
