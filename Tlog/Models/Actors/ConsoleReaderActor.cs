@@ -44,10 +44,13 @@ namespace Tlog.Models.Actors
         private void printInstructions()
         {
             Console.WriteLine("1.-Convertir Tlog");
+            Console.WriteLine("2.-Extraer transacciones de ventas de tlog");
         }
 
         private void getInput()
         {
+            Console.Write(":");
+
             string input = Console.ReadLine();
 
             if (!String.IsNullOrEmpty(input) &&
@@ -65,17 +68,29 @@ namespace Tlog.Models.Actors
             else if(input == "1")
             {
                 doConvertTlog();
+
+            }else if(input == "2")
+            {
+                readTlog();
             }
 
             getInput();
 
         }
 
+        private void readTlog()
+        {
+            Console.Write("Ruta tlog:");
+            string file = Console.ReadLine();
+
+            _tlogCoordinatorActor.Tell(new TlogCoordinatorActor.StartReader(file, TlogCoordinatorActor.StartReader.Reader.Sales, _consoleWriterActor));
+        }
+
         private void doConvertTlog()
         {
             TlogFileModel tlogFileModel = new TlogFileModel();
             
-            Console.WriteLine("Ruta tlog:");
+            Console.Write("Ruta tlog:");
 
             tlogFileModel.BinFile = Console.ReadLine();
 

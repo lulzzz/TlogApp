@@ -29,12 +29,12 @@ namespace Tlog.Models.Actors
         private string[] _cvtlogs;
         private int _indexOfCvtlog;
         private TlogFileModel _tlogFile;
-        private IActorRef _reporterActor;
+        private IActorRef _loggerActor;
 
-        public TlogConvertActor(TlogFileModel tlogFile, IActorRef reporterActor)
+        public TlogConvertActor(TlogFileModel tlogFile, IActorRef logActor)
         {
             _tlogFile = tlogFile;
-            _reporterActor = reporterActor;
+            _loggerActor = logActor;
             _cvtlogs = ConfigurationManager.AppSettings["Cvtlog"].Split(';');
             _indexOfCvtlog = 0;
 
@@ -57,7 +57,7 @@ namespace Tlog.Models.Actors
 
                 if (File.Exists(_tlogFile.TextFile))
                 {
-                    _reporterActor.Tell(new Messages.Success(String.Format("Archivo {0} convertido", _tlogFile.BinFile)));
+                    _loggerActor.Tell(new Messages.Success(String.Format("Archivo {0} convertido", _tlogFile.BinFile)));
                 }
                 else
                 {
@@ -69,7 +69,7 @@ namespace Tlog.Models.Actors
                     }
                     else
                     {
-                        _reporterActor.Tell(new Messages.Error("El archivo no pudo ser convertido por los cvtlog actuales"));
+                        _loggerActor.Tell(new Messages.Error("El archivo no pudo ser convertido por los cvtlog actuales"));
                     }
                 }              
             }  

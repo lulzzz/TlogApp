@@ -23,14 +23,41 @@ namespace Tlog.Models.Actors
             public TlogFileModel File { get; private set; }
 
             /// <summary>
-            /// Actor a quien reporta
+            /// Log
             /// </summary>
-            public IActorRef ReporterActor { get; private set; }
+            public IActorRef LogActor { get; private set; }
 
-            public StartConversion(TlogFileModel file, IActorRef reporterActor)
+            public StartConversion(TlogFileModel file, IActorRef logActor)
             {
                 File = file;
-                ReporterActor = reporterActor;
+                LogActor = logActor;
+            }
+        }
+
+        public class StartReader
+        {
+            /// <summary>
+            /// Datos a leer
+            /// </summary>
+            public enum Reader { Sales }
+
+            public Reader DataToRead { get; private set; }
+
+            /// <summary>
+            /// Tlog convertido a leer
+            /// </summary>
+            public string TlogFilePath { get; private set; }
+
+            /// <summary>
+            /// Actor a quien reporta
+            /// </summary>
+            public IActorRef LogActor { get; private set; }
+
+            public StartReader(string tlogFilePath, Reader dataToRead, IActorRef logActor)
+            {
+                LogActor = logActor;
+                TlogFilePath = tlogFilePath;
+                DataToRead = dataToRead;
             }
         }
 
@@ -41,9 +68,25 @@ namespace Tlog.Models.Actors
             if(message is StartConversion)
             {
                 var msg = message as StartConversion;
+                
+                Context.ActorOf(Props.Create(() => new TlogConvertActor(msg.File, msg.LogActor)));
 
-                Context.ActorOf(Props.Create(() => new TlogConvertActor(msg.File, msg.ReporterActor)));
+            }else if(message is StartReader)
+            {
+                var msg = message as StartReader;
+                IActorRef tlogReaderActor = Context.ActorOf(Props.Create(() => new TlogReaderActor(msg.LogActor)));
+
+                if (msg.DataToRead == StartReader.Reader.Sales)
+                {
+                    tlogReaderActor.Tell(new TlogReaderActor.Sales(msg.TlogFilePath));
+                }
             }
+
+        }
+        
+        protected override SupervisorStrategy SupervisorStrategy()
+        {
+            return new OneForOneStrategy(x => { return Directive.Restart; });
         }
     }
 }
