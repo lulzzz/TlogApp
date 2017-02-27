@@ -50,13 +50,12 @@ namespace Tlog.Models.Actors
 
                 data = data.Distinct().ToList();
 
-                Context.ActorOf(Props.Create(() => new FileWriterActor()), "fileWriterActor")
+                Context.ActorOf(Props.Create(() => new FileWriterActor(_loggerActor)), "fileWriterActor")
                     .Tell(new FileWriterActor.StartWriter(
                         String.Format("{0}\\{1}.Sales.txt",
                             Path.GetDirectoryName(msg.TlogFilePath),
                             Path.GetFileNameWithoutExtension(msg.TlogFilePath)),
-                        data,
-                        _loggerActor
+                        data
                         ));            
                 
                 _loggerActor.Tell(new Messages.Success(String.Format("{0} registros leidos", data.Count)));

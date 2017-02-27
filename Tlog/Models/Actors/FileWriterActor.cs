@@ -25,20 +25,21 @@ namespace Tlog.Models.Actors
             /// </summary>
             public IEnumerable<object> Data { get; private set; }
 
-            /// <summary>
-            /// Log
-            /// </summary>
-            public IActorRef LogActor { get; private set; }
-
-            public StartWriter(string filePath, IEnumerable<object> data, IActorRef logActor)
+            public StartWriter(string filePath, IEnumerable<object> data)
             {
                 FilePath = filePath;
                 Data = data;
-                LogActor = logActor;
             }
         }
-        
+
         #endregion
+
+        private IActorRef _loggerActor;
+
+        public FileWriterActor(IActorRef logActor)
+        {
+            _loggerActor = logActor;
+        }
 
         protected override void OnReceive(object message)
         {
