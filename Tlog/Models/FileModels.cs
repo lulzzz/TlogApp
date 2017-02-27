@@ -25,7 +25,7 @@ namespace Tlog.Models.Files
     /// <summary>
     /// Archivo de Ventas
     /// </summary>
-    class SalesFileModel
+    public class SalesFileModel
     {
         /// <summary>
         /// Caja
@@ -56,5 +56,31 @@ namespace Tlog.Models.Files
         /// Impresora fiscal
         /// </summary>
         public string FiscalPrinter { get; set; }
+    }
+}
+
+namespace Tlog.Models.Files.Comparers
+{
+    public class SalesFileComparer : IEqualityComparer<SalesFileModel>
+    {
+        private const string DATE_FORMAT_STR = "yyMMdd";
+
+        public bool Equals(SalesFileModel x, SalesFileModel y)
+        {
+            return (
+                x.Date.ToString(DATE_FORMAT_STR).Equals(y.Date.ToString(DATE_FORMAT_STR)) &&
+                x.RegNum == y.RegNum &&
+                x.CashierNum == y.CashierNum &&
+                x.TxnNum == y.TxnNum
+                );
+        }
+
+        public int GetHashCode(SalesFileModel obj)
+        {
+            string hashCode = String.Format("{0}{1}",
+                obj.RegNum,
+                obj.TxnNum);
+            return Convert.ToInt32(hashCode);
+        }
     }
 }

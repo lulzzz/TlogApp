@@ -48,8 +48,6 @@ namespace Tlog.Models.Actors
 
                 List<SalesFileModel> data = getSales(readAllTlogLines(msg.TlogFilePath));
 
-                data = data.Distinct().ToList();
-
                 Context.ActorOf(Props.Create(() => new FileWriterActor(_loggerActor)), "fileWriterActor")
                     .Tell(new FileWriterActor.StartWriter(
                         String.Format("{0}\\{1}.Sales.txt",
@@ -133,7 +131,10 @@ namespace Tlog.Models.Actors
                             
                     }
                 }
+
+                data = data.Distinct(new Files.Comparers.SalesFileComparer()).ToList();
             }
+
             return data;
         }
     }
