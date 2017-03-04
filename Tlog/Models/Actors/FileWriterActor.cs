@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Akka.Actor;
 using Tlog.Models.Files;
-using Tlog.Models.Messages;
+
 namespace Tlog.Models.Actors
 {
     class FileWriterActor : UntypedActor

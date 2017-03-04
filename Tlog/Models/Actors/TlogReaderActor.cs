@@ -16,19 +16,41 @@ namespace Tlog.Models.Actors
         #region Messages types
 
         /// <summary>
-        /// Mensaje para leer datos de ventas
+        /// Lectura de tlog
         /// </summary>
-        public class Sales
+        public abstract class TlogReaderFile
         {
             /// <summary>
             /// Ruta del tlog convertido
             /// </summary>
             public string TlogFilePath { get; private set; }
-            
-            public Sales(string tlogFilePath)
+
+            public TlogReaderFile(string tlogFilePath)
             {
                 TlogFilePath = tlogFilePath;
             }
+        }
+
+        /// <summary>
+        /// Mensaje para leer datos de ventas
+        /// </summary>
+        public class Sales : TlogReaderFile
+        {
+            public bool CreateDatFile { get; set; }
+
+            public bool CreateSaleFile { get; set; }
+
+            public Sales(string tlogFilePath) : base(tlogFilePath)
+            {
+                CreateDatFile = false;
+                CreateSaleFile = false;
+            }
+            
+            public Sales(string tlogFilePath, bool createSaleFile, bool createDatFile): base(tlogFilePath)
+            {
+                CreateSaleFile = createSaleFile;
+                CreateDatFile = createDatFile;                
+            }           
         }
 
         #endregion
@@ -46,17 +68,14 @@ namespace Tlog.Models.Actors
             {
                 var msg = message as Sales;
 
-                List<SalesFileModel> data = getSales(readAllTlogLines(msg.TlogFilePath));
+                string[] tlogFile = readAllTlogLines(msg.TlogFilePath);
+                List<SalesFileModel> data = getSales(tlogFile);
 
-                Context.ActorOf(Props.Create(() => new FileWriterActor(_loggerActor)), "fileWriterActor")
-                    .Tell(new FileWriterActor.StartWriter(
-                        String.Format("{0}\\{1}.Sales.txt",
-                            Path.GetDirectoryName(msg.TlogFilePath),
-                            Path.GetFileNameWithoutExtension(msg.TlogFilePath)),
-                        data
-                        ));            
-                
-                _loggerActor.Tell(new Messages.Success(String.Format("{0} registros leidos", data.Count)));
+                writeFile(String.Format("{0}\\{1}.Sales.txt",
+                                Path.GetDirectoryName(msg.TlogFilePath),
+                                Path.GetFileNameWithoutExtension(msg.TlogFilePath)),
+                            data
+                            );
             }
         }
 
@@ -71,6 +90,19 @@ namespace Tlog.Models.Actors
                 return File.ReadAllLines(tlogFilePath);
             
             return null;
+        }
+
+        /// <summary>
+        /// Crea el archivo
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="data"></param>
+        private void writeFile(string filePath,List<SalesFileModel> data)
+        {
+            Context.ActorOf(Props.Create(() => new FileWriterActor(_loggerActor)), "fileWriterActor")
+                .Tell(new FileWriterActor.StartWriter(filePath,data));
+
+            _loggerActor.Tell(new LoggerActor.WriteLog(String.Format("{0} registros leidos", data.Count), Logger.LogType.Success));
         }
 
         /// <summary>

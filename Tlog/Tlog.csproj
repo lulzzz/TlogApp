@@ -56,13 +56,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\Actors\ConsoleReaderActor.cs" />
-    <Compile Include="Models\Actors\ConsoleWriterActor.cs" />
     <Compile Include="Models\Actors\FileWriterActor.cs" />
+    <Compile Include="Models\Actors\LoggerActor.cs" />
     <Compile Include="Models\Actors\TlogConvertActor.cs" />
     <Compile Include="Models\Actors\TlogCoordinatorActor.cs" />
     <Compile Include="Models\Actors\TlogReaderActor.cs" />
     <Compile Include="Models\FileModels.cs" />
-    <Compile Include="Models\MessageModels.cs" />
+    <Compile Include="Models\Logger\ConsoleLog.cs" />
+    <Compile Include="Models\Logger\ILogger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

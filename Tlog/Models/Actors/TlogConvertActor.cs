@@ -57,7 +57,7 @@ namespace Tlog.Models.Actors
 
                 if (File.Exists(_tlogFile.TextFile))
                 {
-                    _loggerActor.Tell(new Messages.Success(String.Format("Archivo {0} convertido", _tlogFile.BinFile)));
+                    _loggerActor.Tell(new LoggerActor.WriteLog(String.Format("Archivo {0} convertido", _tlogFile.BinFile), Logger.LogType.Success));
                 }
                 else
                 {
@@ -69,7 +69,7 @@ namespace Tlog.Models.Actors
                     }
                     else
                     {
-                        _loggerActor.Tell(new Messages.Error("El archivo no pudo ser convertido por los cvtlog actuales"));
+                        _loggerActor.Tell(new LoggerActor.WriteLog("El archivo no pudo ser convertido por los cvtlog actuales", Logger.LogType.Error));
                     }
                 }              
             }  
